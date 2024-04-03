@@ -1,9 +1,0 @@
-.dockerignore
-.git
-.github
-.gitignore
-CONTRIBUTING.md
-data
-Dockerfile
-pyrightconfig.json
-assets/showcase.psd
