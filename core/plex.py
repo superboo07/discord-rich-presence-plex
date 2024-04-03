@@ -246,12 +246,9 @@ class PlexAlertListener(threading.Thread):
 			thumb = item.grandparentThumb
 		elif mediaType == "track":
 			title = shortTitle = item.title
-			artistAlbum = f"{item.originalTitle or item.grandparentTitle} - {item.parentTitle}"
-			parent = self.server.fetchItem(item.parentRatingKey)
-			if parent.year:
-				artistAlbum += f" ({parent.year})"
+			artistAlbum = f"{item.originalTitle or item.grandparentTitle}"
 			stateStrings.append(artistAlbum)
-			largeText = "Listening to music"
+			largeText = f"{item.parentTitle}"
 			thumb = item.thumb
 		else:
 			title = shortTitle = item.title
