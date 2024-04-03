@@ -49,6 +49,7 @@ The config file is stored in a directory named `data`.
   * `posters`
     * `enabled` (boolean, default: `false`) - Displays media posters if enabled. Requires `imgurClientID`.
     * `imgurClientID` (string, default: `""`) - [Obtention Instructions](#obtaining-an-imgur-client-id)
+    * `padPoster` (boolean, default: `false`) - Pads the uploaded poster so that it doesn't clip. Please clear the imgur cache by deleting `cache.json` after changing this variable!
     * `maxSize` (int, default: `256`) - Maximum width and maximum height to use while downscaling posters before uploading them.
   * `buttons` (list) - [Information](#buttons)
     * `label` (string) - The label to be displayed on the button.

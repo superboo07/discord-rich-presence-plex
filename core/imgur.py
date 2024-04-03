@@ -1,12 +1,13 @@
 from .config import config
 from PIL import Image
+from PIL import ImageOps
 from typing import Optional
 from utils.logging import logger
 import io
 import models.imgur
 import requests
 
-def uploadToImgur(url: str, maxSize: int = 0) -> Optional[str]:
+def uploadToImgur(url: str, maxSize: int = 0, padPoster: bool = False) -> Optional[str]:
 	try:
 		originalImageBytesIO = io.BytesIO(requests.get(url).content)
 		originalImage = Image.open(originalImageBytesIO)
@@ -15,7 +16,9 @@ def uploadToImgur(url: str, maxSize: int = 0) -> Optional[str]:
 		if maxSize:
 			newImage.thumbnail((maxSize, maxSize))
 		newImageBytesIO = io.BytesIO()
-		newImage.save(newImageBytesIO, subsampling = 0, quality = 90, format = "JPEG")
+		if padPoster:
+			newImage = ImageOps.pad(newImage, (maxSize, maxSize))
+		newImage.save(newImageBytesIO, subsampling = 0, quality = 90, format = "PNG")
 		data: models.imgur.UploadResponse = requests.post(
 			"https://api.imgur.com/3/image",
 			headers = { "Authorization": f"Client-ID {config['display']['posters']['imgurClientID']}" },
