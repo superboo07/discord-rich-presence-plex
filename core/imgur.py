@@ -11,13 +11,13 @@ def uploadToImgur(url: str, maxSize: int = 0, padPoster: bool = False) -> Option
 	try:
 		originalImageBytesIO = io.BytesIO(requests.get(url).content)
 		originalImage = Image.open(originalImageBytesIO)
-		newImage = Image.new("RGB", originalImage.size)
+		newImage = Image.new("RGBA", originalImage.size)
 		newImage.putdata(originalImage.getdata()) # pyright: ignore[reportUnknownMemberType,reportUnknownArgumentType]
 		if maxSize:
 			newImage.thumbnail((maxSize, maxSize))
 		newImageBytesIO = io.BytesIO()
 		if padPoster:
-			newImage = ImageOps.pad(newImage, (maxSize, maxSize))
+			newImage = ImageOps.pad(newImage, (maxSize, maxSize), color=(255,255,255,0))
 		newImage.save(newImageBytesIO, subsampling = 0, quality = 90, format = "PNG")
 		data: models.imgur.UploadResponse = requests.post(
 			"https://api.imgur.com/3/image",
