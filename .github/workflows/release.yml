@@ -1,0 +1,29 @@
+name: Release
+run-name: Release ${{ github.ref_name }}
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+jobs:
+  release-zip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_ZIP_FILENAME: ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Create release ZIP file
+        run: |-
+          mv .github/release-notes ../
+          rm -rf .git .github .gitignore .dockerignore Dockerfile CONTRIBUTING.md pyrightconfig.json
+          mkdir ${{ github.event.repository.name }}
+          mv * ${{ github.event.repository.name }} || true
+          zip -r $RELEASE_ZIP_FILENAME ${{ github.event.repository.name }}
+      - name: Release on GitHub
+        uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981
+        with:
+          files: ${{ env.RELEASE_ZIP_FILENAME }}
+          body_path: ../release-notes/${{ github.ref_name }}.md
