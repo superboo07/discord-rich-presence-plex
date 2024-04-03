@@ -1,5 +1,6 @@
 from config.constants import isInContainer, runtimeDirectory, uid, gid, containerCwd, noRuntimeDirChown
 from utils.logging import logger
+import webbrowser
 import os
 
 if isInContainer:
@@ -96,8 +97,9 @@ def main() -> None:
 
 def authNewUser() -> Optional[models.config.User]:
 	id, code, url = initiateAuth()
-	logger.info("Open the below URL in your web browser and sign in:")
+	logger.info("Please sign in using the browser window that has opened, or use the below URL:")
 	logger.info(url)
+	webbrowser.open(url)
 	time.sleep(5)
 	for i in range(35):
 		logger.info(f"Checking whether authentication is successful ({formatSeconds((i + 1) * 5)})")
