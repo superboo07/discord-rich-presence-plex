@@ -227,13 +227,12 @@ class PlexAlertListener(threading.Thread):
 			largeText = item.title
 			thumb = item.thumb
 		elif mediaType == "episode":
-			title = shortTitle = item.grandparentTitle
+			title = shortTitle = item.title
 			grandparent = self.server.fetchItem(item.grandparentRatingKey)
-			if grandparent.year:
-				title += f" ({grandparent.year})"
 			stateStrings.append(f"S{item.parentIndex:02}E{item.index:02}")
-			stateStrings.append(item.title)
-			largeText = "Watching a TV show"
+			largeText = item.grandparentTitle
+			if grandparent.year:
+				largeText += f" ({grandparent.year})"
 			thumb = item.grandparentThumb
 		elif mediaType == "live_episode":
 			title = shortTitle = item.grandparentTitle
