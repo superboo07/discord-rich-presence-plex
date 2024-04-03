@@ -220,8 +220,6 @@ class PlexAlertListener(threading.Thread):
 		stateStrings: list[str] = []
 		if mediaType == "movie":
 			title = shortTitle = item.title
-			if item.year:
-				title += f" ({item.year})"
 			if item.editionTitle:
 				stateStrings.append(item.editionTitle)
 			largeText = item.title
