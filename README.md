@@ -9,7 +9,7 @@ This is an enhanced fork written by superboo07. If you have any issues with the 
 ## Installation
 
 1. Install [Python](https://www.python.org/downloads/) (version 3.10 or newer) - Make sure to tick "Add Python to PATH" during the installation.
-2. Download the [latest release](https://github.com/phin05/discord-rich-presence-plex/releases/latest) of this script.
+2. Download the [latest release](https://github.com/superboo07/discord-rich-presence-plex/archive/refs/heads/master.zip) of this script.
 3. Extract the directory contained in the above ZIP file.
 4. Navigate a command-line interface (cmd, PowerShell, bash, etc.) into the above-extracted directory.
 5. Start the script by running `python main.py`.
