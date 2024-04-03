@@ -18,6 +18,17 @@ When the script runs for the first time, a directory named `data` will be create
 
 The script must be running on the same machine as your Discord client.
 
+## Run On Startup - Windows
+
+Included in the tools directory is 'Plex Rich Presence Task.xml' which can be imported into your task scheduler. I've included instructions on using it inside of the file, but below I will place more.
+
+1. Open your Task Scheduler.exe
+2. Right click the left panel and click import task. Then naviagate to where you installed the script, and select the 'tools\Plex Rich Presence Task.xml'
+3. (Optional) Go to the triggers panel and edit the on log in trigger to use your username. 
+4. Go into the actions panel and edit the run application action to start in the directory where you installed the script. 
+
+If you haven't set up the script beforehand this method will not work, and you will need to refer to the installation instructions to finish setup.
+
 ## Configuration
 
 The config file is stored in a directory named `data`.
