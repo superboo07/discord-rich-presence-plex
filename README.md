@@ -9,7 +9,7 @@ This is an enhanced fork written by superboo07. If you have any issues with the 
 ## Installation
 
 1. Install [Python](https://www.python.org/downloads/) (version 3.10 or newer) - Make sure to tick "Add Python to PATH" during the installation.
-2. Download the [latest release](https://github.com/superboo07/discord-rich-presence-plex/archive/refs/heads/master.zip) of this script.
+2. Download the [latest release](https://github.com/superboo07/discord-rich-presence-plex/releases/latest) of this script.
 3. Extract the directory contained in the above ZIP file.
 4. Navigate a command-line interface (cmd, PowerShell, bash, etc.) into the above-extracted directory.
 5. Start the script by running `python main.py`.
@@ -20,10 +20,10 @@ The script must be running on the same machine as your Discord client.
 
 ## Run On Startup - Windows
 
-Included in the tools directory is 'Plex Rich Presence Task.xml' which can be imported into your task scheduler. I've included instructions on using it inside of the file, but below I will place more.
+Included in the tools directory is `Plex Rich Presence Task.xml` which can be imported into your task scheduler. I've included instructions on using it inside of the file, but below I will place more.
 
 1. Open your Task Scheduler.exe
-2. Right click the left panel and click import task. Then naviagate to where you installed the script, and select the 'tools\Plex Rich Presence Task.xml'
+2. Right click the left panel and click import task. Then naviagate to where you installed the script, and select the `tools\Plex Rich Presence Task.xml`
 3. (Optional) Go to the triggers panel and edit the on log in trigger to use your username. 
 4. Go into the actions panel and edit the run application action to start in the directory where you installed the script. 
 
