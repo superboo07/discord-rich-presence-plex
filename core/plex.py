@@ -218,25 +218,17 @@ class PlexAlertListener(threading.Thread):
 		self.updateTimeoutTimer.start()
 		self.lastState, self.lastSessionKey, self.lastRatingKey = state, sessionKey, ratingKey
 		stateStrings: list[str] = []
-		if not config["display"]["hideTotalTime"] and item.duration and mediaType != "track":
-			stateStrings.append(formatSeconds(item.duration / 1000))
 		if mediaType == "movie":
 			title = shortTitle = item.title
-			if item.year:
-				title += f" ({item.year})"
-			if item.genres:
-				genres: list[Genre] = item.genres[:3]
-				stateStrings.append(f"{', '.join(genre.tag for genre in genres)}")
-			largeText = "Watching a movie"
+			if item.editionTitle:
+				stateStrings.append(item.editionTitle)
+			largeText = item.title
 			thumb = item.thumb
 		elif mediaType == "episode":
-			title = shortTitle = item.grandparentTitle
+			title = shortTitle = item.title
 			grandparent = self.server.fetchItem(item.grandparentRatingKey)
-			if grandparent.year:
-				title += f" ({grandparent.year})"
 			stateStrings.append(f"S{item.parentIndex:02}E{item.index:02}")
-			stateStrings.append(item.title)
-			largeText = "Watching a TV show"
+			largeText = item.grandparentTitle
 			thumb = item.grandparentThumb
 		elif mediaType == "live_episode":
 			title = shortTitle = item.grandparentTitle
