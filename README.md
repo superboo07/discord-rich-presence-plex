@@ -46,10 +46,12 @@ The config file is stored in a directory named `data`.
 * `display` - Display settings for Rich Presence
   * `hideTotalTime` (boolean, default: `false`) - Hides the total duration of the media if enabled.
   * `useRemainingTime` (boolean, default: `false`) - Displays the media's remaining time instead of elapsed time if enabled.
+  * `showDirector` (boolean, default: `true`) - Shows the director of the movie in the rich presence
+  * `showEdition` (boolean, default: `true`) - Shows the edition of the movie in the rich presence
   * `posters`
     * `enabled` (boolean, default: `false`) - Displays media posters if enabled. Requires `imgurClientID`.
     * `imgurClientID` (string, default: `""`) - [Obtention Instructions](#obtaining-an-imgur-client-id)
-    * `padPoster` (boolean, default: `false`) - Pads the uploaded poster so that it doesn't clip. Please clear the imgur cache by deleting `cache.json` after changing this variable!
+    * `padPoster` (boolean, default: `true`) - Pads the uploaded poster so that it doesn't clip. Please clear the imgur cache by deleting `cache.json` after changing this variable!
     * `maxSize` (int, default: `256`) - Maximum width and maximum height to use while downscaling posters before uploading them.
   * `buttons` (list) - [Information](#buttons)
     * `label` (string) - The label to be displayed on the button.

@@ -220,7 +220,15 @@ class PlexAlertListener(threading.Thread):
 		stateStrings: list[str] = []
 		if mediaType == "movie":
 			title = shortTitle = item.title
-			if item.editionTitle:
+			if config["display"]["showDirector"]:
+				if item.directors:
+					for i in item.directors:
+						stateStrings.append(i.tag)
+					if config["display"]["showEdition"] and item.editionTitle:
+						title = title + f" • {str(item.editionTitle)}"
+				else:
+					stateStrings.append(item.editionTitle)
+			elif config["display"]["showEdition"] and item.editionTitle:
 				stateStrings.append(item.editionTitle)
 			largeText = item.title
 			thumb = item.thumb

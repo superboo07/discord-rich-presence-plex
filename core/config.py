@@ -15,10 +15,12 @@ config: models.config.Config = {
 	"display": {
 		"hideTotalTime": False,
 		"useRemainingTime": False,
+		"showDirector": True,
+		"showEdition": True,
 		"posters": {
 			"enabled": False,
 			"imgurClientID": "",
-			"padPoster": False,
+			"padPoster": True,
 			"maxSize": 256
 		},
 		"buttons": [],
