@@ -34,7 +34,13 @@ def getAuthToken(id: str, code: str) -> Optional[str]:
 	}).json()
 	return response["authToken"]
 
-validMediaTypes = ["movie", "episode", "live_episode", "track", "clip"]
+mediaTypeActivityTypeMap = {
+	"movie": models.discord.ActivityType.WATCHING,
+	"episode": models.discord.ActivityType.WATCHING,
+	"live_episode": models.discord.ActivityType.WATCHING,
+	"track": models.discord.ActivityType.LISTENING,
+	"clip": models.discord.ActivityType.WATCHING,
+}
 buttonTypeGuidTypeMap = {
 	"imdb": "imdb",
 	"tmdb": "tmdb",
@@ -132,7 +138,6 @@ class PlexAlertListener(threading.Thread):
 	def connectionCheck(self) -> None:
 		try:
 			self.logger.debug("Running periodic connection check")
-			assert self.server
 			self.server.clients()
 		except Exception as e:
 			self.reconnect(e)
@@ -147,6 +152,15 @@ class PlexAlertListener(threading.Thread):
 			self.logger.exception("An unexpected error occured in the Plex alert handler")
 			self.disconnectRpc()
 
+	def uploadToImgur(self, thumb: str, maxSize, padPoster) -> Optional[str]:
+		thumbUrl = getCacheKey(thumb)
+		if not thumbUrl or not isinstance(thumbUrl, str):
+			self.logger.debug("Uploading image to Imgur")
+			thumbUrl = uploadToImgur(self.server.url(thumb, True), maxSize, padPoster)
+			setCacheKey(thumb, thumbUrl)
+		return thumbUrl
+
+
 	def handleAlert(self, alert: models.plex.Alert) -> None:
 		if alert["type"] != "playing" or "PlaySessionStateNotification" not in alert:
 			return
@@ -159,7 +173,7 @@ class PlexAlertListener(threading.Thread):
 			mediaType = "live_episode"
 		else:
 			mediaType: str = item.type
-		if mediaType not in validMediaTypes:
+		if mediaType not in mediaTypeActivityTypeMap:
 			self.logger.debug("Unsupported media type '%s', ignoring", mediaType)
 			return
 		state = stateNotification["state"]
@@ -232,50 +246,59 @@ class PlexAlertListener(threading.Thread):
 				stateStrings.append(item.editionTitle)
 			largeText = item.title
 			thumb = item.thumb
+			smallText = ""
+			smallThumb = ""
 		elif mediaType == "episode":
 			title = shortTitle = item.title
 			grandparent = self.server.fetchItem(item.grandparentRatingKey)
 			stateStrings.append(f"S{item.parentIndex:02}E{item.index:02}")
 			largeText = item.grandparentTitle
 			thumb = item.grandparentThumb
+			smallText = ""
+			smallThumb = ""
 		elif mediaType == "live_episode":
 			title = shortTitle = item.grandparentTitle
 			if item.title != item.grandparentTitle:
 				stateStrings.append(item.title)
 			largeText = "Watching live TV"
 			thumb = item.grandparentThumb
+			smallText = ""
+			smallThumb = ""
 		elif mediaType == "track":
 			title = shortTitle = item.title
-			artistAlbum = f"{item.originalTitle or item.grandparentTitle}"
-			stateStrings.append(artistAlbum)
-			largeText = f"{item.parentTitle}"
+			smallText = ""
+			stateStrings.append(item.originalTitle)
+			largeText = item.parentTitle
 			thumb = item.thumb
+			# smallThumb = item.grandparentThumb
+			smallThumb = ""
+
 		else:
 			title = shortTitle = item.title
 			largeText = "Watching a video"
 			thumb = item.thumb
+			smallText = ""
+			smallThumb = ""
 		if state != "playing" and mediaType != "track":
-			if config["display"]["useRemainingTime"]:
+			if config["display"]["progressMode"] == "remaining":
 				stateStrings.append(f"{formatSeconds((item.duration - viewOffset) / 1000, ':')} left")
 			else:
 				stateStrings.append(f"{formatSeconds(viewOffset / 1000, ':')} elapsed")
 		stateText = " · ".join(stateString for stateString in stateStrings if stateString)
 		thumbUrl = ""
-		if thumb and config["display"]["posters"]["enabled"]:
-			thumbUrl = getCacheKey(thumb)
-			if not thumbUrl or not isinstance(thumbUrl, str):
-				self.logger.debug("Uploading poster to Imgur")
-				thumbUrl = uploadToImgur(self.server.url(thumb, True), config["display"]["posters"]["maxSize"], config["display"]["posters"]["padPoster"])
-				setCacheKey(thumb, thumbUrl)
-		activity: models.discord.Activity = {
-			"details": truncate(title, 128),
-			"assets": {
-				"large_text": largeText,
-				"large_image": thumbUrl or "logo",
-				"small_text": state.capitalize(),
-				"small_image": state,
-			},
-		}
+		thumbUrl = self.uploadToImgur(thumb, config["display"]["posters"]["maxSize"], config["display"]["posters"]["padPoster"]) if thumb and config["display"]["posters"]["enabled"] else ""
+		smallThumbUrl = self.uploadToImgur(smallThumb, config["display"]["posters"]["maxSize"], config["display"]["posters"]["padPoster"]) if smallThumb and config["display"]["posters"]["enabled"] else ""
+		if mediaType:
+			activity: models.discord.Activity = {
+				"type": mediaTypeActivityTypeMap[mediaType],
+				"details": title,
+				"assets": {
+					"large_text": largeText,
+					"large_image": thumbUrl or "logo",
+					"small_text": smallText or state.capitalize(),
+					"small_image": smallThumbUrl or state,
+				},
+			}
 		if stateText:
 			activity["state"] = truncate(stateText, 128)
 		if config["display"]["buttons"]:
@@ -320,12 +343,17 @@ class PlexAlertListener(threading.Thread):
 					buttons.append({ "label": label, "url": url })
 			if buttons:
 				activity["buttons"] = buttons[:2]
-		if state == "playing":
-			currentTimestamp = int(time.time())
-			if config["display"]["useRemainingTime"]:
-				activity["timestamps"] = {"end": round(currentTimestamp + ((item.duration - viewOffset) / 1000))}
-			else:
-				activity["timestamps"] = {"start": round(currentTimestamp - (viewOffset / 1000))}
+			if state == "playing":
+				currentTimestamp = int(time.time() * 1000)
+				match config["display"]["progressMode"]:
+					case "elapsed":
+						activity["timestamps"] = { "start": round(currentTimestamp - viewOffset) }
+					case "remaining":
+						activity["timestamps"] = { "end": round(currentTimestamp + (item.duration - viewOffset)) }
+					case "bar":
+						activity["timestamps"] = { "start": round(currentTimestamp - viewOffset), "end": round(currentTimestamp + (item.duration - viewOffset)) }
+					case _:
+						pass
 		if not self.discordIpcService.connected:
 			self.discordIpcService.connect()
 		if self.discordIpcService.connected:

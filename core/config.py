@@ -14,7 +14,7 @@ config: models.config.Config = {
 	},
 	"display": {
 		"hideTotalTime": False,
-		"useRemainingTime": False,
+		"progressMode": "bar",
 		"showDirector": True,
 		"showEdition": True,
 		"posters": {

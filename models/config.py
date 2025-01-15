@@ -16,7 +16,7 @@ class Button(TypedDict):
 
 class Display(TypedDict):
 	hideTotalTime: bool
-	useRemainingTime: bool
+	progressMode: str
 	posters: Posters
 	buttons: list[Button]
 
