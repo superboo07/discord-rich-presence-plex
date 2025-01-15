@@ -266,8 +266,8 @@ class PlexAlertListener(threading.Thread):
 			smallThumb = ""
 		elif mediaType == "track":
 			title = shortTitle = item.title
-			smallText = item.originalTitle
-			stateStrings.append(item.originalTitle)
+			smallText = item.originalTitle or item.grandparentTitle
+			stateStrings.append(smallText)
 			largeText = item.parentTitle
 			thumb = item.thumb
 			# smallThumb = item.grandparentThumb
