@@ -239,7 +239,7 @@ class PlexAlertListener(threading.Thread):
 					for i in item.directors:
 						stateStrings.append(i.tag)
 					if config["display"]["showEdition"] and item.editionTitle:
-						title = title + f" • {str(item.editionTitle)}"
+						title = title + f" {str(item.editionTitle)}"
 				else:
 					stateStrings.append(item.editionTitle)
 			elif config["display"]["showEdition"] and item.editionTitle:
